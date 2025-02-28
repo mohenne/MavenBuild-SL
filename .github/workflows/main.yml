@@ -17,9 +17,7 @@ jobs:
       - name: Build a code
         run:  mvn package
       - name: Deploy the code on Tomcat9
-      - name: SSH SCP
         uses: cross-the-world/ssh-scp-ssh-pipelines@latest
-
         with:
           host: '3.108.4.170'
           user: 'labuser'
