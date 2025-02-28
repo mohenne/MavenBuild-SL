@@ -1,29 +1,34 @@
-name: CICD using Maven and tomcat
+name: CICD using Maven and Tomcat
 on:
- push:  # run when there is commit to repo
- workflow_dispatch:  # run manually
+  push: # run where there is commit to repo
+  workflow_dispatch:  $ run manually
 jobs:
- CICDjob:
-   runs-on: ubuntu-latest
-   steps:
-    - name: Clone the repo on ubuntu server
-      uses: actions/checkout@v4
-    - name: Install Java and maven on ubuntu server
-      uses: actions/setup-java@v4
-      with:
-       distribution: 'temurin'
-       java-version: '11'
-       cache: 'maven'
-    - name: Build the code 
-      run: mvn package
-    - name: Connect to Lab machine and trigger a Jenkins job 
-      uses: cross-the-world/ssh-scp-ssh-pipelines@latest
-      with:
-        host: '43.205.118.149'
-        user: 'labuser'
-        pass: 'Nuvelabs123$'
-        port: 22
-        connect_timeout: 10s
-        first_ssh: |
-          curl -l -u admin:Root123$ http://localhost:8080/job/Githubaction_trigger/build?token=token1    
-    
+  CICDjob:
+    runs-on:  ubuntu-latest
+    steps:
+      - name: Clone the repo on ubuntu server
+        uses: actions/checkout@v4
+      - name: Install Java and Maven on ubuntu server
+        uses: actions/setup-jave@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache:  'maven'
+      - name: Build a code
+        run:  mvn package
+      - name: Deploy the code on Tomcat9
+      - name: SSH SCP
+        uses: cross-the-world/ssh-scp-ssh-pipelines@latest
+
+        with:
+          host: '3.108.4.170'
+          user: 'labuser'
+          password: '${{secrets.LAB_PASSWORD}}'
+          port: 22
+          connect_timeout:  10s
+          first_ssh:  |
+            sudo chmod 777 /var/lib/tomcat9/webapps
+          scp:  |
+            './target/*war' => /var/lib/tomcat9/webapps
+          last_ssh: |
+            sudo systemctl restart tomcat9
